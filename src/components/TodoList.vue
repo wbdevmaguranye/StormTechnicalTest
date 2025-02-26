@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import { useTodoStore } from '@/stores/todoStore';
 
 const store = useTodoStore();
@@ -31,6 +31,13 @@ const saveEdit = (id) => {
     editedText.value = '';
     editError.value = '';
 };
+watch(
+    () => store.todos,
+    (newTodos) => {
+        localStorage.setItem('todos', JSON.stringify(newTodos));
+    },
+    { deep: true }
+);
 </script>
 
 <template>
