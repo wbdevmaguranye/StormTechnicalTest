@@ -70,16 +70,17 @@ watch(
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="todo in store.pendingTodos" :key="todo.id" class="border-b">
+                <tr v-for="todo in store.pendingTodos" :key="todo.id" class="border-b" data-test="todo-item">
                     <td class="p-3 border">
                         <span v-if="editedTodo !== todo">{{ todo.text }}</span>
                         <div v-else>
-                            <input v-model="editedText" class="border border-red-600 p-1 rounded w-full "
+                            <input v-model="editedText" data-test="edit-input"
+                                class="border border-red-600 p-1 rounded w-full "
                                 :class="{ 'border-red-500': editError }" />
                             <p v-if="editError" class="text-red-500 text-sm">{{ editError }}</p>
                         </div>
                     </td>
-                    <td class="p-3 flex justify-center gap-2 border">
+                    <td class="p-3 flex justify-center gap-2 ">
                         <button v-if="editedTodo !== todo" @click="store.toggleTodo(todo.id)"
                             class="bg-green-500 text-white px-3 py-1 rounded-md">
                             Complete
