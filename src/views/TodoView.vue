@@ -1,3 +1,11 @@
+<script setup>
+import TodoList from '@/components/TodoList.vue';
+</script>
 <template>
-  <div class="flex justify-center mt-3">Component: TodoView</div>
+
+
+  <main class="min-h-screen flex items-center justify-center bg-gray-50">
+    <TodoList />
+  </main>
+
 </template>

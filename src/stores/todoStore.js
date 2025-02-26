@@ -1,12 +1,14 @@
 import { defineStore } from 'pinia';
-
+import { ref } from 'vue';
 export const useTodoStore = defineStore('todo', {
   state: () => ({
-    todos: [],
+    todos: ref([]),
+    filter: 'all',
   }),
   actions :{
     addTodo(text){
-        this.todos.push({id: Date.now(), text, completed:false});
+        const timestamp = Date.now();
+        this.todos.push({id: timestamp, text, completed:false});
     },
     removeTodo(id){
         this.todos = this.todos.filter(todo =>todo.id !== id);
@@ -18,6 +20,18 @@ export const useTodoStore = defineStore('todo', {
     updateTodo(id,newText){
         const todo = this.todos.find(todo => todo.id === id);
         if (todo) todo.text = newText;
+    },
+    setFilter(type){
+        this.filter = type;
+    }
+  },
+  getters:{
+    completedTodos:(state) => state.todos.filter(todo => todo.completed),
+    pendingTodos: (state) => state.todos.filter(todo => !todo.completed),
+    filteredTodos: (state) => {
+        if (state.filter === 'completed') return state.completedTodos;
+      if (state.filter === 'pending') return state.pendingTodos;
+      return state.todos;
     }
   }
 
