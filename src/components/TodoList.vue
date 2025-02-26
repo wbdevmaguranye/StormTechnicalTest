@@ -159,7 +159,7 @@ watch(
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="todo in store.completedTodos" :key="todo.id" class="border-b">
+                <tr v-for="todo in store.completedTodos" :key="todo.id">
                     <td class="p-3 border text-gray-500 line-through">{{ todo.text }}</td>
                     <td class="p-3 flex justify-center gap-2 border">
                         <button @click="store.toggleTodo(todo.id)" class="btn btn-warning">
@@ -179,7 +179,7 @@ watch(
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="todo in store.deletedTodos" :key="todo.id" class="border-b">
+                <tr v-for="todo in store.deletedTodos" :key="todo.id">
                     <td class="p-3 border text-gray-500">{{ todo.text }}</td>
                     <td class="p-3 flex justify-center gap-2 border">
                         <button @click="store.restoreDeleted(todo.id)" class="btn btn-primary">
