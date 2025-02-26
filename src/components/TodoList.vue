@@ -9,6 +9,10 @@ const editedText = ref('');
 const editError = ref('');
 const activeTab = ref('pending');
 
+
+const selectedTodos = ref([]);
+
+
 const addTodo = () => {
     if (newTodo.value.trim()) {
         store.addTodo(newTodo.value);
@@ -16,11 +20,13 @@ const addTodo = () => {
     }
 };
 
+
 const editTodo = (todo) => {
     editedTodo.value = todo;
     editedText.value = todo.text;
     editError.value = '';
 };
+
 
 const saveEdit = (id) => {
     if (!editedText.value.trim()) {
@@ -32,6 +38,25 @@ const saveEdit = (id) => {
     editedText.value = '';
     editError.value = '';
 };
+
+
+const completeSelected = () => {
+    selectedTodos.value.forEach((id) => {
+        store.toggleTodo(id);
+    });
+
+    selectedTodos.value = [];
+};
+
+
+const deleteSelected = () => {
+    selectedTodos.value.forEach((id) => {
+        store.removeTodo(id);
+    });
+
+    selectedTodos.value = [];
+};
+
 watch(
     () => store.todos,
     (newTodos) => {
@@ -48,60 +73,83 @@ watch(
         <div class="flex gap-2 mb-6">
             <input v-model="newTodo" class="border p-2 flex-1 rounded-md" placeholder="Enter a task"
                 @keyup.enter="addTodo" />
-            <button @click="addTodo" class="bg-green-500 text-white px-4 py-2 rounded-md">ADD</button>
+            <button @click="addTodo" class="btn btn-success">ADD</button>
         </div>
 
-        <div class="flex justify-center mb-4">
-            <button @click="activeTab = 'pending'" class="px-4 py-2 mx-2 rounded-md transition"
-                :class="activeTab === 'pending' ? 'bg-blue-500 text-white' : 'bg-gray-200'">Pending</button>
+        <!-- Tabs -->
+        <div class="flex justify-start mb-4 font-serif">
+            <button @click="activeTab = 'pending'" class="px-4 py-2 mx-0 rounded-md transition"
+                :class="activeTab === 'pending' ? 'bg-blue-500 text-white' : 'bg-gray-200'">
+                Pending
+            </button>
 
             <button @click="activeTab = 'completed'" class="px-4 py-2 mx-2 rounded-md transition"
-                :class="activeTab === 'completed' ? 'bg-green-500 text-white' : 'bg-gray-200'">Completed</button>
+                :class="activeTab === 'completed' ? 'bg-green-500 text-white' : 'bg-gray-200'">
+                Completed
+            </button>
 
             <button @click="activeTab = 'deleted'" class="px-4 py-2 mx-2 rounded-md transition"
-                :class="activeTab === 'deleted' ? 'bg-red-500 text-white' : 'bg-gray-200'">Deleted</button>
+                :class="activeTab === 'deleted' ? 'bg-red-500 text-white' : 'bg-gray-200'">
+                Deleted
+            </button>
         </div>
-        <!-- Task Table -->
+
+        <!-- Bulk Actions (only for Pending tab) -->
+        <div v-if="activeTab === 'pending'" class="mb-4 flex gap-2">
+            <button @click="completeSelected" class="btn btn-success">
+                Complete Selected
+            </button>
+            <button @click="deleteSelected" class="btn btn-danger">
+                Delete Selected
+            </button>
+        </div>
+
+        <!-- Pending Tasks Table -->
         <table v-if="activeTab === 'pending'" class="w-full border-collapse">
             <thead>
                 <tr class="bg-gray-200">
+                    <th class="p-3 text-center border font-serif">Select</th>
                     <th class="p-3 text-left border font-serif">Task</th>
                     <th class="p-3 text-center border">Actions</th>
                 </tr>
             </thead>
             <tbody>
                 <tr v-for="todo in store.pendingTodos" :key="todo.id" class="border-b" data-test="todo-item">
+                    <td class="p-3 text-center border">
+                        <input type="checkbox" :value="todo.id" v-model="selectedTodos" class="cursor-pointer" />
+                    </td>
+
                     <td class="p-3 border">
                         <span v-if="editedTodo !== todo">{{ todo.text }}</span>
                         <div v-else>
                             <input v-model="editedText" data-test="edit-input"
-                                class="border border-red-600 p-1 rounded w-full "
+                                class="border border-red-600 p-1 rounded w-full"
                                 :class="{ 'border-red-500': editError }" />
                             <p v-if="editError" class="text-red-500 text-sm">{{ editError }}</p>
                         </div>
                     </td>
-                    <td class="p-3 flex justify-center gap-2 ">
-                        <button v-if="editedTodo !== todo" @click="store.toggleTodo(todo.id)"
-                            class="bg-green-500 text-white px-3 py-1 rounded-md">
+
+                    <td class="p-3 flex justify-center gap-2">
+                        <button v-if="editedTodo !== todo" @click="store.toggleTodo(todo.id)" class="btn btn-success">
                             Complete
                         </button>
-
-                        <button @click="editTodo(todo)"
-                            class="bg-blue-500 text-white px-3 py-1 rounded-md">Edit</button>
-                        <button v-if="editedTodo !== todo" @click="store.removeTodo(todo.id)"
-                            class="bg-red-500 text-white px-3 py-1 rounded-md">Delete</button>
-                        <button v-if="editedTodo === todo" @click="saveEdit(todo.id)"
-                            class="bg-green-500 text-white px-3 py-1 rounded-md">
+                        <button @click="editTodo(todo)" class="btn btn-primary">
+                            Edit
+                        </button>
+                        <button v-if="editedTodo !== todo" @click="store.removeTodo(todo.id)" class="btn btn-danger">
+                            Delete
+                        </button>
+                        <button v-if="editedTodo === todo" @click="saveEdit(todo.id)" class="btn btn-success">
                             Save
                         </button>
-                        <button v-if="editedTodo === todo" @click="editedTodo = null"
-                            class="bg-gray-500 text-white px-3 py-1 rounded-md">
+                        <button v-if="editedTodo === todo" @click="editedTodo = null" class="btn btn-gray">
                             Cancel
                         </button>
                     </td>
                 </tr>
             </tbody>
         </table>
+
         <!-- Completed Tasks Table -->
         <table v-if="activeTab === 'completed'" class="w-full border-collapse">
             <thead>
@@ -114,8 +162,7 @@ watch(
                 <tr v-for="todo in store.completedTodos" :key="todo.id" class="border-b">
                     <td class="p-3 border text-gray-500 line-through">{{ todo.text }}</td>
                     <td class="p-3 flex justify-center gap-2 border">
-                        <button @click="store.toggleTodo(todo.id)"
-                            class="bg-yellow-500 text-white px-3 py-1 rounded-md">
+                        <button @click="store.toggleTodo(todo.id)" class="btn btn-warning">
                             Undo
                         </button>
                     </td>
@@ -135,8 +182,7 @@ watch(
                 <tr v-for="todo in store.deletedTodos" :key="todo.id" class="border-b">
                     <td class="p-3 border text-gray-500">{{ todo.text }}</td>
                     <td class="p-3 flex justify-center gap-2 border">
-                        <button @click="store.restoreDeleted(todo.id)"
-                            class="bg-blue-500 text-white px-3 py-1 rounded-md">
+                        <button @click="store.restoreDeleted(todo.id)" class="btn btn-primary">
                             Restore
                         </button>
                     </td>
@@ -146,8 +192,34 @@ watch(
     </div>
 </template>
 
+
 <style scoped>
 .line-through {
     text-decoration: line-through;
+}
+
+/* Tailwind-based button classes for consistency */
+.btn {
+    @apply inline-flex items-center justify-center px-4 py-0 rounded-md transition-colors;
+}
+
+.btn-success {
+    @apply bg-green-500 text-white hover:bg-green-600;
+}
+
+.btn-danger {
+    @apply bg-red-500 text-white hover:bg-red-600;
+}
+
+.btn-primary {
+    @apply bg-blue-500 text-white hover:bg-blue-600;
+}
+
+.btn-warning {
+    @apply bg-yellow-500 text-white hover:bg-yellow-600;
+}
+
+.btn-gray {
+    @apply bg-gray-500 text-white hover:bg-gray-600;
 }
 </style>
