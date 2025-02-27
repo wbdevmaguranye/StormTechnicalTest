@@ -73,22 +73,21 @@ watch(
         <div class="flex gap-2 mb-6">
             <input v-model="newTodo" class="border p-2 flex-1 rounded-md" placeholder="Enter a task"
                 @keyup.enter="addTodo" />
-            <button @click="addTodo" class="btn btn-success">ADD</button>
+            <button data-test="add-button" @click="addTodo" class="btn btn-success">ADD</button>
         </div>
 
         <!-- Tabs -->
         <div class="flex justify-start mb-4 font-serif">
-            <button @click="activeTab = 'pending'" class="px-4 py-2 mx-0 rounded-md transition"
+            <button data-test="pending-tab" @click="activeTab = 'pending'" class="px-4 py-2 mx-0 rounded-md transition"
                 :class="activeTab === 'pending' ? 'bg-blue-500 text-white' : 'bg-gray-200'">
                 Pending
             </button>
-
-            <button @click="activeTab = 'completed'" class="px-4 py-2 mx-2 rounded-md transition"
+            <button data-test="completed-tab" @click="activeTab = 'completed'"
+                class="px-4 py-2 mx-2 rounded-md transition"
                 :class="activeTab === 'completed' ? 'bg-green-500 text-white' : 'bg-gray-200'">
                 Completed
             </button>
-
-            <button @click="activeTab = 'deleted'" class="px-4 py-2 mx-2 rounded-md transition"
+            <button data-test="deleted-tab" @click="activeTab = 'deleted'" class="px-4 py-2 mx-2 rounded-md transition"
                 :class="activeTab === 'deleted' ? 'bg-red-500 text-white' : 'bg-gray-200'">
                 Deleted
             </button>
@@ -96,10 +95,10 @@ watch(
 
         <!-- Bulk Actions (only for Pending tab) -->
         <div v-if="activeTab === 'pending'" class="mb-4 flex gap-2">
-            <button @click="completeSelected" class="btn btn-success">
+            <button data-test="bulk-complete" @click="completeSelected" class="btn btn-success">
                 Complete Selected
             </button>
-            <button @click="deleteSelected" class="btn btn-danger">
+            <button data-test="bulk-delete" @click="deleteSelected" class="btn btn-danger">
                 Delete Selected
             </button>
         </div>
@@ -118,7 +117,6 @@ watch(
                     <td class="p-3 text-center border">
                         <input type="checkbox" :value="todo.id" v-model="selectedTodos" class="cursor-pointer" />
                     </td>
-
                     <td class="p-3 border">
                         <span v-if="editedTodo !== todo">{{ todo.text }}</span>
                         <div v-else>
@@ -128,21 +126,28 @@ watch(
                             <p v-if="editError" class="text-red-500 text-sm">{{ editError }}</p>
                         </div>
                     </td>
-
                     <td class="p-3 flex justify-center gap-2">
-                        <button v-if="editedTodo !== todo" @click="store.toggleTodo(todo.id)" class="btn btn-success">
+
+                        <button v-if="editedTodo !== todo" data-test="complete-button"
+                            @click="store.toggleTodo(todo.id)" class="btn btn-success">
                             Complete
                         </button>
-                        <button @click="editTodo(todo)" class="btn btn-primary">
+
+                        <button data-test="edit-button" @click="editTodo(todo)" class="btn btn-primary">
                             Edit
                         </button>
-                        <button v-if="editedTodo !== todo" @click="store.removeTodo(todo.id)" class="btn btn-danger">
+                        <button v-if="editedTodo !== todo" data-test="delete-button" @click="store.removeTodo(todo.id)"
+                            class="btn btn-danger">
                             Delete
                         </button>
-                        <button v-if="editedTodo === todo" @click="saveEdit(todo.id)" class="btn btn-success">
+
+                        <button v-if="editedTodo === todo" data-test="save-button" @click="saveEdit(todo.id)"
+                            class="btn btn-success">
                             Save
                         </button>
-                        <button v-if="editedTodo === todo" @click="editedTodo = null" class="btn btn-gray">
+
+                        <button v-if="editedTodo === todo" data-test="cancel-button" @click="editedTodo = null"
+                            class="btn btn-gray">
                             Cancel
                         </button>
                     </td>
@@ -159,10 +164,10 @@ watch(
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="todo in store.completedTodos" :key="todo.id">
+                <tr v-for="todo in store.completedTodos" :key="todo.id" class="border-b">
                     <td class="p-3 border text-gray-500 line-through">{{ todo.text }}</td>
                     <td class="p-3 flex justify-center gap-2 border">
-                        <button @click="store.toggleTodo(todo.id)" class="btn btn-warning">
+                        <button data-test="undo-button" @click="store.toggleTodo(todo.id)" class="btn btn-warning">
                             Undo
                         </button>
                     </td>
@@ -179,10 +184,11 @@ watch(
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="todo in store.deletedTodos" :key="todo.id">
+                <tr v-for="todo in store.deletedTodos" :key="todo.id" class="border-b">
                     <td class="p-3 border text-gray-500">{{ todo.text }}</td>
                     <td class="p-3 flex justify-center gap-2 border">
-                        <button @click="store.restoreDeleted(todo.id)" class="btn btn-primary">
+                        <button data-test="restore-button" @click="store.restoreDeleted(todo.id)"
+                            class="btn btn-primary">
                             Restore
                         </button>
                     </td>
@@ -191,8 +197,6 @@ watch(
         </table>
     </div>
 </template>
-
-
 <style scoped>
 .line-through {
     text-decoration: line-through;
